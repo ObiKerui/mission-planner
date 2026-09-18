@@ -1,0 +1,188 @@
+# ─────────────────────────────────────────────
+
+# Python
+
+# ─────────────────────────────────────────────
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+*.so
+
+# Python virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging / distribution
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# PyInstaller
+
+*.manifest
+*.spec
+
+# Coverage
+
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# Type checking / linters
+
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Jupyter
+
+.ipynb_checkpoints/
+
+# ─────────────────────────────────────────────
+
+# Environment / secrets
+
+# ─────────────────────────────────────────────
+
+.env
+.env.*
+!.env.example
+
+# ─────────────────────────────────────────────
+
+# Node / Vite
+
+# ─────────────────────────────────────────────
+
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.yarn-cache/
+
+dist/
+.vite/
+
+*.tsbuildinfo
+
+# ─────────────────────────────────────────────
+
+# IDEs / editors
+
+# ─────────────────────────────────────────────
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+.idea/
+*.iml
+
+# Vim
+
+*.swp
+*.swo
+
+# VS Code / Cursor
+
+.history/
+
+# ─────────────────────────────────────────────
+
+# Docker
+
+# ─────────────────────────────────────────────
+
+docker-compose.override.yml
+
+# ─────────────────────────────────────────────
+
+# PostgreSQL / database
+
+# ─────────────────────────────────────────────
+
+*.dump
+*.sql.gz
+
+# Local database data directories
+
+postgres-data/
+pgdata/
+
+# ─────────────────────────────────────────────
+
+# Logs
+
+# ─────────────────────────────────────────────
+
+*.log
+logs/
+
+# ─────────────────────────────────────────────
+
+# OS
+
+# ─────────────────────────────────────────────
+
+# Windows
+
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+
+*~
+.fuse_hidden*
+.directory
+
+# ─────────────────────────────────────────────
+
+# Temporary files
+
+# ─────────────────────────────────────────────
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# ─────────────────────────────────────────────
+
+# Project-specific generated files
+
+# ─────────────────────────────────────────────
+
+# Generated SQLAlchemy models
+
+# Uncomment if you decide these should never be committed
+
+# database/database/models/generated.py
+
+# Vendored Python wheels
+
+# Uncomment if vendor wheels should be generated during deployment
+
+# rest-api/vendor/*.whl
