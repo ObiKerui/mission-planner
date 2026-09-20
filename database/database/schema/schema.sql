@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS rules;
+DROP TABLE IF EXISTS mission_events;
 
 CREATE TABLE rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -19,3 +20,10 @@ CREATE INDEX idx_rules_enabled
 
 CREATE INDEX idx_rules_definition
     ON rules USING GIN (definition);
+
+CREATE TABLE mission_events (
+    id BIGSERIAL PRIMARY KEY,
+    event_type TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);    

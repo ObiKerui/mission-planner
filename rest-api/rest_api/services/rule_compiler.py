@@ -1,8 +1,11 @@
 from typing import Any
 
+from rest_api.config import NODE_RED_MQTT_HOST, NODE_RED_MQTT_PORT
+
 
 def compile_rule(
     definition: dict[str, Any],
+    flow_id: str,
 ) -> list[dict[str, Any]]:
 
     nodes = definition["nodes"]
@@ -11,19 +14,45 @@ def compile_rule(
     wires = build_wires(nodes, edges)
 
     compiled = [
-        compile_node(node, wires[node["id"]])
+        compile_node(
+            node,
+            wires[node["id"]],
+            flow_id,
+        )
         for node in nodes
     ]
 
     compiled.insert(
         0,
         {
-            "id": "rule-flow",
+            "id": flow_id,
             "type": "tab",
-            "label": "Compiled Rule",
+            "label": definition.get(
+                "name",
+                "Compiled Rule",
+            ),
             "disabled": False,
             "info": "",
             "env": [],
+        },
+    )
+    
+    print('what is broker port? ', NODE_RED_MQTT_HOST, NODE_RED_MQTT_PORT)
+
+    compiled.insert(
+        1,
+        {
+            "id": f"{flow_id}-mqtt-broker",
+            "type": "mqtt-broker",
+            "name": "Mosquitto",
+            "broker": NODE_RED_MQTT_HOST,
+            "port": NODE_RED_MQTT_PORT,
+            "clientid": "",
+            "autoConnect": True,
+            "usetls": False,
+            "protocolVersion": 4,
+            "keepalive": 60,
+            "cleansession": True,
         },
     )
 
@@ -33,6 +62,7 @@ def compile_rule(
 def compile_node(
     node: dict[str, Any],
     wires: list[list[str]],
+    flow_id: str,
 ) -> dict[str, Any]:
 
     node_type = node["type"]
@@ -44,7 +74,11 @@ def compile_node(
             f"Unsupported rule node type: {node_type}"
         )
 
-    return compiler(node, wires)
+    return compiler(
+        node,
+        wires,
+        flow_id,
+    )
 
 
 def build_wires(
@@ -85,7 +119,9 @@ def build_wires(
                 f"Unknown source node '{source}'"
             )
 
-        output_index = output_indexes[source].get(source_handle)
+        output_index = output_indexes[source].get(
+            source_handle
+        )
 
         if output_index is None:
             raise ValueError(
@@ -101,6 +137,7 @@ def build_wires(
 def compile_trigger(
     node: dict[str, Any],
     wires: list[list[str]],
+    flow_id: str,
 ) -> dict[str, Any]:
 
     data = node["data"]
@@ -108,7 +145,7 @@ def compile_trigger(
     return {
         "id": node["id"],
         "type": "inject",
-        "z": "rule-flow",
+        "z": flow_id,
         "name": data["label"],
         "props": [
             {
@@ -131,6 +168,7 @@ def compile_trigger(
 def compile_navigate(
     node: dict[str, Any],
     wires: list[list[str]],
+    flow_id: str,
 ) -> dict[str, Any]:
 
     data = node["data"]
@@ -138,7 +176,7 @@ def compile_navigate(
     return {
         "id": node["id"],
         "type": "function",
-        "z": "rule-flow",
+        "z": flow_id,
         "name": data["label"],
         "func": (
             f"msg.navigation = {{"
@@ -157,6 +195,7 @@ def compile_navigate(
 def compile_search(
     node: dict[str, Any],
     wires: list[list[str]],
+    flow_id: str,
 ) -> dict[str, Any]:
 
     data = node["data"]
@@ -164,7 +203,7 @@ def compile_search(
     return {
         "id": node["id"],
         "type": "function",
-        "z": "rule-flow",
+        "z": flow_id,
         "name": data["label"],
         "func": (
             f"msg.search = {{"
@@ -184,6 +223,7 @@ def compile_search(
 def compile_condition(
     node: dict[str, Any],
     wires: list[list[str]],
+    flow_id: str,
 ) -> dict[str, Any]:
 
     data = node["data"]
@@ -191,7 +231,7 @@ def compile_condition(
     return {
         "id": node["id"],
         "type": "switch",
-        "z": "rule-flow",
+        "z": flow_id,
         "name": data["label"],
         "property": "payload.detected",
         "propertyType": "msg",
@@ -215,23 +255,28 @@ def compile_condition(
 def compile_action(
     node: dict[str, Any],
     wires: list[list[str]],
+    flow_id: str,
 ) -> dict[str, Any]:
 
     data = node["data"]
 
     return {
         "id": node["id"],
-        "type": "debug",
-        "z": "rule-flow",
+        "type": "mqtt out",
+        "z": flow_id,
         "name": data["label"],
-        "active": True,
-        "tosidebar": True,
-        "console": False,
-        "tostatus": False,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
+        "topic": data.get(
+            "topic",
+            "mission/events",
+        ),
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": f"{flow_id}-mqtt-broker",
         "x": node["position"]["x"],
         "y": node["position"]["y"],
         "wires": [],

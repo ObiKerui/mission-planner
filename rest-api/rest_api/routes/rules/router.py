@@ -1,19 +1,24 @@
-import httpx
 from database.models.generated import Rules
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 
 from rest_api.dependencies import DbSession
 from rest_api.routes.rules.schemas import RuleResponse
+from rest_api.services.node_red_service import NodeRedService
 from rest_api.services.rule_compiler import compile_rule
 
 router = APIRouter(prefix="/rules", tags=["rules"],)
+
+def get_node_red_service(
+    request: Request,
+) -> NodeRedService:
+    return request.app.state.node_red_service
 
 @router.get(
     "",
     response_model=list[RuleResponse],
 )
-def list(db: DbSession):
+def list_rules(db: DbSession):
 
     statement = select(Rules)
 
@@ -25,7 +30,7 @@ def list(db: DbSession):
     "/{rule_id}",
     response_model=RuleResponse,
 )
-def get(rule_id: str, db: DbSession):
+def get_rule(rule_id: str, db: DbSession):
     statement = select(Rules).where(Rules.id == rule_id)
 
     result = db.execute(statement)
@@ -44,6 +49,9 @@ def get(rule_id: str, db: DbSession):
 def deploy_rule(
     rule_id: str,
     db: DbSession,
+    node_red_service: NodeRedService = Depends(
+        get_node_red_service
+    ),
 ):
     statement = select(Rules).where(Rules.id == rule_id)
 
@@ -56,39 +64,15 @@ def deploy_rule(
             detail="Rule not found",
         )
 
-    flow = compile_rule(rule.definition)
-
-    response = httpx.post(
-        "http://localhost:1880/flows",
-        json=flow,
-        timeout=10.0,
+    flow = compile_rule(
+        rule.definition,
+        rule_id,
     )
 
-    response.raise_for_status()
+    node_red_service.deploy_flow(flow)
 
     return {
         "status": "deployed",
         "rule_id": rule.id,
     }
-
-@router.post("/test-deploy")
-def test_deploy():
-    definition = {
-        "nodes": [],
-        "edges": [],
-    }
-
-    flow = compile_rule(definition)
-
-    response = httpx.post(
-        "http://localhost:1880/flows",
-        json=flow,
-        timeout=10.0,
-    )
-
-    response.raise_for_status()
-
-    return {
-        "status": "deployed",
-        "flow": flow,
-    }
+    

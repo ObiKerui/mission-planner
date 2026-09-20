@@ -23,6 +23,7 @@ services:
     restart: "no"
     ports:
       - "1883:1883"
+      - "9001:9001"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - mosquitto_data:/mosquitto/data
@@ -36,7 +37,7 @@ services:
       MINIO_ROOT_PASSWORD: minioadminpassword
     ports:
       - "9000:9000"
-      - "9001:9001"
+      - "9002:9001"
     volumes:
       - minio_data:/data
 

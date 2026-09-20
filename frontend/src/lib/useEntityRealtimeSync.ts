@@ -11,7 +11,7 @@ export function useEntityRealtimeSync(
   const { subscribe, ready } = useMqtt();
   const qc = useQueryClient();
 
-  (useEffect(() => {
+  useEffect(() => {
     if (!ready) {
       return;
     }
@@ -29,6 +29,5 @@ export function useEntityRealtimeSync(
         queryKey: keys.list(),
       });
     });
-  }),
-    [ready, subscribe, qc, topic, keys, extractId]);
+  }, [ready, subscribe, qc, topic, keys, extractId]);
 }

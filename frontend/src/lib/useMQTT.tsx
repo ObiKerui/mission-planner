@@ -1,10 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import mqtt from "mqtt";
 import type { MqttClient } from "mqtt";
-// import type { MQTTMessage} from '@/tyupes'
 
-type MqttMessageHandler = (topic: string, payload: any) => void;
+type MqttPayload = unknown;
+
+type MqttMessageHandler = (topic: string, payload: MqttPayload) => void;
 
 interface UseMqttOptions {
   url: string;
@@ -20,6 +20,12 @@ export function useMqtt({
   autoConnect = true,
 }: UseMqttOptions) {
   const clientRef = useRef<MqttClient | null>(null);
+  const onMessageRef = useRef(onMessage);
+
+  // Keep the latest callback without causing the MQTT
+  // connection to be recreated when the callback changes.
+  onMessageRef.current = onMessage;
+
   const subscribe = useCallback(
     (client: MqttClient) => {
       const topicList = Array.isArray(topics) ? topics : [topics];
@@ -27,7 +33,7 @@ export function useMqtt({
       topicList.forEach((topic) => {
         client.subscribe(topic, (err) => {
           if (err) {
-            console.error("MQTT subscribe error:", err);
+            console.error(`MQTT subscribe error for "${topic}":`, err);
           }
         });
       });
@@ -36,24 +42,24 @@ export function useMqtt({
   );
 
   useEffect(() => {
-    if (!autoConnect) return;
+    if (!autoConnect) {
+      return;
+    }
 
     const client = mqtt.connect(url);
+
     clientRef.current = client;
 
     client.on("connect", () => {
       console.log("MQTT connected");
       subscribe(client);
     });
+
     client.on("message", (topic, message) => {
       try {
         const payload = JSON.parse(message.toString());
-        // Parse nested JSON field
-        if (typeof payload.results === "string") {
-          payload.results = JSON.parse(payload.results);
-        }
-        console.log(typeof payload, payload.results);
-        onMessage(topic, payload as MQTTMessage);
+
+        onMessageRef.current(topic, payload);
       } catch (err) {
         console.error("MQTT message parse error:", err);
       }
@@ -63,11 +69,15 @@ export function useMqtt({
       console.error("MQTT error:", err);
     });
 
+    client.on("close", () => {
+      console.log("MQTT connection closed");
+    });
+
     return () => {
       client.end(true);
       clientRef.current = null;
     };
-  }, [url, subscribe, onMessage, autoConnect]);
+  }, [url, subscribe, autoConnect]);
 
   return clientRef;
 }
