@@ -6,5 +6,10 @@ export const Route = createFileRoute("/rules/")({
 });
 
 function RulePage() {
-  return <Selection />;
+  return (
+    <div className="flex h-full w-full flex-col gap-4 p-2 pl-4">
+      {" "}
+      <Selection />
+    </div>
+  );
 }

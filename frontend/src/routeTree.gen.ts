@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MapIndexRouteImport } from './routes/map/index'
 import { Route as ObservationsIndexRouteImport } from './routes/observations/index'
 import { Route as ObservationsExternalIdRouteImport } from './routes/observations/$externalId'
 import { Route as RulesIndexRouteImport } from './routes/rules/index'
@@ -18,6 +19,11 @@ import { Route as RulesExternalIdRouteImport } from './routes/rules/$externalId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapIndexRoute = MapIndexRouteImport.update({
+  id: '/map/',
+  path: '/map/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ObservationsIndexRoute = ObservationsIndexRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/observations/$externalId': typeof ObservationsExternalIdRoute
   '/rules/$externalId': typeof RulesExternalIdRoute
+  '/map/': typeof MapIndexRoute
   '/observations/': typeof ObservationsIndexRoute
   '/rules/': typeof RulesIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/observations/$externalId': typeof ObservationsExternalIdRoute
   '/rules/$externalId': typeof RulesExternalIdRoute
+  '/map': typeof MapIndexRoute
   '/observations': typeof ObservationsIndexRoute
   '/rules': typeof RulesIndexRoute
 }
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/observations/$externalId': typeof ObservationsExternalIdRoute
   '/rules/$externalId': typeof RulesExternalIdRoute
+  '/map/': typeof MapIndexRoute
   '/observations/': typeof ObservationsIndexRoute
   '/rules/': typeof RulesIndexRoute
 }
@@ -69,6 +78,7 @@ export interface FileRouteTypes {
     | '/'
     | '/observations/$externalId'
     | '/rules/$externalId'
+    | '/map/'
     | '/observations/'
     | '/rules/'
   fileRoutesByTo: FileRoutesByTo
@@ -76,6 +86,7 @@ export interface FileRouteTypes {
     | '/'
     | '/observations/$externalId'
     | '/rules/$externalId'
+    | '/map'
     | '/observations'
     | '/rules'
   id:
@@ -83,6 +94,7 @@ export interface FileRouteTypes {
     | '/'
     | '/observations/$externalId'
     | '/rules/$externalId'
+    | '/map/'
     | '/observations/'
     | '/rules/'
   fileRoutesById: FileRoutesById
@@ -91,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ObservationsExternalIdRoute: typeof ObservationsExternalIdRoute
   RulesExternalIdRoute: typeof RulesExternalIdRoute
+  MapIndexRoute: typeof MapIndexRoute
   ObservationsIndexRoute: typeof ObservationsIndexRoute
   RulesIndexRoute: typeof RulesIndexRoute
 }
@@ -102,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map/': {
+      id: '/map/'
+      path: '/map'
+      fullPath: '/map/'
+      preLoaderRoute: typeof MapIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/observations/': {
@@ -139,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ObservationsExternalIdRoute: ObservationsExternalIdRoute,
   RulesExternalIdRoute: RulesExternalIdRoute,
+  MapIndexRoute: MapIndexRoute,
   ObservationsIndexRoute: ObservationsIndexRoute,
   RulesIndexRoute: RulesIndexRoute,
 }

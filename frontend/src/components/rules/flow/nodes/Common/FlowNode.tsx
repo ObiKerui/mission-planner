@@ -10,10 +10,8 @@ interface CommonNodeProps {
 }
 
 export function CommonNode({ title, ports, children }: CommonNodeProps) {
-  console.log(title, ports);
-
   return (
-    <div className="relative min-w-[220px] rounded-lg border bg-background shadow-sm">
+    <div className="bg-background relative min-w-55 rounded-lg border shadow-sm">
       {ports.inputs.map((port) => (
         <Handle
           key={`input-${port.id}`}
@@ -32,8 +30,8 @@ export function CommonNode({ title, ports, children }: CommonNodeProps) {
         />
       ))}
 
-      <div className="rounded-t-lg border-b bg-muted px-4 py-2">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <div className="bg-muted rounded-t-lg border-b px-4 py-2">
+        <div className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
           {title}
         </div>
       </div>

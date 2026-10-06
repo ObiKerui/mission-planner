@@ -1,0 +1,15 @@
+# --- Node-RED runtime/editor state ---
+.config.*.json
+.config.*.json.backup
+.sessions.json
+context/
+
+# --- Credentials: see settings.js credentialSecret note ---
+flows_cred.json
+
+# --- node_modules: ignore everything except our custom plugin's source ---
+node_modules/*
+!node_modules/node-red-contrib-flow-trace/
+
+# --- but still ignore the plugin's OWN nested dependencies ---
+node_modules/node-red-contrib-flow-trace/node_modules/

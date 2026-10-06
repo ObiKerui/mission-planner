@@ -7,6 +7,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 import "./index.css";
 import "@xyflow/react/dist/style.css";
+import { MqttProvider } from "./lib/mqttClient";
+import "cesium/Build/Cesium/Widgets/widgets.css";
 
 const router = createRouter({
   routeTree,
@@ -26,8 +28,10 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <MqttProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </MqttProvider>
   </StrictMode>,
 );

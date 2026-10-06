@@ -9,21 +9,43 @@ import {
 
 import { ruleNodeTypes } from "./nodeTypes";
 import type { RuleDefinition } from "@/entities/rules";
+import { useFlowTrace } from "@/features/flow-trace/useFlowTrace";
+import { useMemo } from "react";
+import { NodePalette } from "@/features/node-palette/Palette";
+import { useAddNode } from "./useAddNode";
 
 interface RuleFlowProps {
   definition: RuleDefinition;
+  flowId: string;
 }
 
-export function RuleFlow({ definition }: RuleFlowProps) {
-  const [nodes, , onNodesChange] = useNodesState(definition.nodes);
+export function RuleFlow({ definition, flowId }: RuleFlowProps) {
+  const [nodes, setNodes, onNodesChange] = useNodesState(definition.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(definition.edges);
 
-  console.log("edges: ", definition.edges, edges);
+  const activeAt = useFlowTrace(flowId);
+  const { onDrop, onDragOver } = useAddNode(setNodes);
+
+  const styledNodes = useMemo(
+    () =>
+      nodes.map((n) =>
+        activeAt[n.id]
+          ? { ...n, className: `${n.className ?? ""} flow-node-active`.trim() }
+          : n.className?.includes("flow-node-active")
+            ? {
+                ...n,
+                className: n.className.replace("flow-node-active", "").trim(),
+              }
+            : n,
+      ),
+    [nodes, activeAt],
+  );
 
   return (
-    <div className="h-[600px] w-full">
+    <div className="flex h-full w-full gap-2">
+      <NodePalette />
       <ReactFlow
-        nodes={nodes}
+        nodes={styledNodes}
         edges={edges}
         nodeTypes={ruleNodeTypes}
         fitView
@@ -33,6 +55,8 @@ export function RuleFlow({ definition }: RuleFlowProps) {
         onConnect={(connection) => {
           setEdges((edges) => addEdge(connection, edges));
         }}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
       >
         <Background />
         <Controls />

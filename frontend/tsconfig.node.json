@@ -7,11 +7,17 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "module": "nodenext",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+
+    // "module": "nodenext",
+    // "allowImportingTsExtensions": true,
+    // "verbatimModuleSyntax": true,
+    // "moduleDetection": "force",
+    // "noEmit": true,
 
     /* Linting */
     "noUnusedLocals": true,

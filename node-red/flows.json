@@ -1,0 +1,123 @@
+[
+    {
+        "id": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7",
+        "type": "tab",
+        "label": "Compiled Rule",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7-mqtt-broker",
+        "type": "mqtt-broker",
+        "name": "Mosquitto",
+        "broker": "mqtt",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true
+    },
+    {
+        "id": "start",
+        "type": "inject",
+        "z": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7",
+        "name": "Start Mission",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "mission_started",
+        "payloadType": "str",
+        "x": 100,
+        "y": 100,
+        "wires": [
+            [
+                "navigate"
+            ]
+        ]
+    },
+    {
+        "id": "navigate",
+        "type": "function",
+        "z": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7",
+        "name": "Navigate to Search Area",
+        "func": "msg.navigation = {area: 'search-area-1', altitude_m: 120};\nreturn msg;",
+        "outputs": 1,
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "search"
+            ]
+        ]
+    },
+    {
+        "id": "search",
+        "type": "function",
+        "z": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7",
+        "name": "Search Area",
+        "func": "msg.search = {pattern: 'lawn_mower', spacing_m: 80};\nmsg.payload = { detected: true };\nreturn msg;",
+        "outputs": 1,
+        "x": 700,
+        "y": 100,
+        "wires": [
+            [
+                "detect"
+            ]
+        ]
+    },
+    {
+        "id": "detect",
+        "type": "switch",
+        "z": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7",
+        "name": "Target Detected",
+        "property": "payload.detected",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1000,
+        "y": 100,
+        "wires": [
+            [
+                "report"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "report",
+        "type": "mqtt out",
+        "z": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7",
+        "name": "Report Detection",
+        "topic": "mission/events",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "72ddb62f-cdd8-4970-b73c-83b6aa7362e7-mqtt-broker",
+        "x": 1300,
+        "y": 100,
+        "wires": []
+    }
+]

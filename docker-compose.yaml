@@ -48,13 +48,14 @@ services:
     ports:
       - "1880:1880"
     volumes:
-      - nodered_data:/data
+      - ./node-red:/data
     environment:
       - TZ=Europe/London
+      - TRACE_BROKER=mqtt://mqtt:1883
+      - TRACE_TOPIC=nodered/trace
 
 volumes:
   db_data:
   mosquitto_data:
   mosquitto_log:
   minio_data:
-  nodered_data:

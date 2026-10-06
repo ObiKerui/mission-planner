@@ -20,10 +20,17 @@ export type RuleNodeData = {
   [key: string]: unknown;
 };
 
-export type RuleNode = Node<
-  RuleNodeData,
-  "trigger" | "navigate" | "search" | "condition" | "action"
->;
+const nodeTypes = [
+  "trigger",
+  "navigate",
+  "search",
+  "condition",
+  "action",
+] as const;
+
+export type tNodeType = (typeof nodeTypes)[number];
+
+export type RuleNode = Node<RuleNodeData, tNodeType>;
 
 export interface RuleDefinition {
   nodes: RuleNode[];

@@ -1,6 +1,7 @@
 import { RuleFlow } from "@/components/rules/flow/RuleFlow";
 import { useRule } from "@/entities/rules";
 import { createFileRoute } from "@tanstack/react-router";
+import { ReactFlowProvider } from "@xyflow/react";
 
 export const Route = createFileRoute("/rules/$externalId")({
   component: RuleDetailPage,
@@ -8,7 +9,6 @@ export const Route = createFileRoute("/rules/$externalId")({
 
 function RuleDetailPage() {
   const { externalId } = Route.useParams();
-
   const { data, isLoading, isError } = useRule(externalId);
 
   if (isLoading) {
@@ -22,5 +22,10 @@ function RuleDetailPage() {
   if (!data) {
     return <div>Rule not found.</div>;
   }
-  return <RuleFlow definition={data.definition} />;
+
+  return (
+    <ReactFlowProvider>
+      <RuleFlow definition={data.definition} flowId={externalId} />
+    </ReactFlowProvider>
+  );
 }

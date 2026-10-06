@@ -2,21 +2,30 @@ import { type NodeProps } from "@xyflow/react";
 
 import { CommonNode } from "../Common/FlowNode";
 import type { RuleNode } from "@/entities/rules";
+import { FlowNodeDialog } from "../Common/FlowNodeDialog";
+import { DialogContent } from "./DialogContent";
 
 export function FlowNode({ data }: NodeProps<RuleNode>) {
   return (
     <CommonNode title="Condition" ports={data.ports}>
-      <div className="font-medium">{data.label}</div>
+      <FlowNodeDialog
+        title={data.label}
+        trigger={
+          <span className="font-medium hover:cursor-pointer">{data.label}</span>
+        }
+      >
+        <DialogContent />
+      </FlowNodeDialog>
 
-      <div className="mt-1 text-sm text-muted-foreground">
+      <div className="text-muted-foreground mt-1 text-sm">
         Event: {String(data.event)}
       </div>
 
-      <div className="mt-1 text-sm text-muted-foreground">
+      <div className="text-muted-foreground mt-1 text-sm">
         Object: {String(data.object_type)}
       </div>
 
-      <div className="mt-1 text-sm text-muted-foreground">
+      <div className="text-muted-foreground mt-1 text-sm">
         Confidence ≥ {String(data.minimum_confidence)}
       </div>
     </CommonNode>

@@ -55,6 +55,24 @@ def compile_rule(
             "cleansession": True,
         },
     )
+    
+    compiled.insert(
+        2,
+        {
+            "id": f"{flow_id}-pg-config",
+            "type": "postgreSQLConfig",
+            "name": "Mission DB",
+            "host": NODE_RED_PG_HOST,
+            "port": NODE_RED_PG_PORT,
+            "database": NODE_RED_PG_DATABASE,
+            "ssl": False,
+            "max": 10,
+            "idle": 1000,
+            "connectionTimeout": 10000,
+            "user": NODE_RED_PG_USER,
+            "password": NODE_RED_PG_PASSWORD,
+        },
+    )    
 
     return compiled
 
@@ -281,6 +299,33 @@ def compile_action(
         "y": node["position"]["y"],
         "wires": [],
     }
+    
+def compile_record_event(
+    node: dict[str, Any],
+    wires: list[list[str]],
+    flow_id: str,
+) -> dict[str, Any]:
+
+    data = node["data"]
+
+    return {
+        "id": node["id"],
+        "type": "postgresql",
+        "z": flow_id,
+        "name": data["label"],
+        "query": (
+            "INSERT INTO mission_events "
+            "(flow_id, node_id, event_type, payload, created_at) "
+            "VALUES ($1, $2, $3, $4, NOW())"
+        ),
+        "postgreSQLConfig": f"{flow_id}-pg-config",
+        "split": False,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": node["position"]["x"],
+        "y": node["position"]["y"],
+        "wires": wires,
+    }    
 
 
 NODE_COMPILERS = {
@@ -289,4 +334,5 @@ NODE_COMPILERS = {
     "search": compile_search,
     "condition": compile_condition,
     "action": compile_action,
+    "record_event": compile_record_event,    
 }
